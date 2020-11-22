@@ -1,9 +1,14 @@
 #include <iostream>
-#include <unistd.h>
 #include <iomanip>
 #include <thread>
-#include <pthread.h>
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
+#include <cstdlib>
 using namespace std;
+
 
 
 // Clear Screen 
@@ -44,7 +49,7 @@ void UpdateTime(bool running){
     while (running){
 
         DisplayTime(hrs, min, secs, period);
-        sleep(1);
+        Sleep(1);
         if (secs == 59){
             secs = 0;
             if (min == 59){
@@ -97,7 +102,7 @@ int DisplayMenu(){
 // if Button Pressed?
 int main (){
     bool running = true;
-    // thread t1 = thread(UpdateTime, running);
+    thread t1 = thread(UpdateTime, running);
     // thread t1(UpdateTime, );
     
 
