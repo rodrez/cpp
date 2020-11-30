@@ -1,4 +1,4 @@
-// Author: Fabian Rodriguez 
+// Author: Fabian Rodriguez
 // Class: Cs210 Programming Languages
 // Project: Clock.cpp
 
@@ -11,15 +11,18 @@
 
 using namespace std;
 
-// Global Variable 
+// Global Variable
 static int _12hrs = 11;
 static int _24hrs = 23;
 static int minutes = 59;
 static int seconds = 55;
 static string period = " A M";
-static bool is_Finished = false;
+static bool is_Stopped = false;
+bool running = false;
+bool onTime = false;
+bool menuStopped = false;
 
-// Clear Screen 
+// Clear Screen
 void ClearScreen() {
 
     //Simple for loop that prints new line(functions as the most basic clear screen)
@@ -58,17 +61,20 @@ void UpdateTime() {
 
 
     // The while loop will keep the clock running until is_Finished becomes true
-    while (!is_Finished) {
+    while (!onTime) {
 
 
         // Multiple nested if/else statements helps to increment the time in 1 second interval
+
+        if (!is_Stopped){
+
         if (seconds == 59)
         {
-            seconds = 1;
+            seconds = 0;
 
             if (minutes == 59)
             {
-                minutes = 1;
+                minutes = 0;
 
                 if (_12hrs == 12)
                 {
@@ -110,6 +116,11 @@ void UpdateTime() {
         DisplayTime();
         Sleep(1000);
         ClearScreen();
+        }
+        else
+        {
+            continue;
+        }
 
     }
 
@@ -120,60 +131,77 @@ void DisplayMenu() {
 
     int userSelection = 0;
 
+
+    // Used _kbhit to detect user input
+    // If user input is detected then the menu is shown otherwise, the loops does'nt do anything
     while (true) {
+        if (_kbhit()){
+            is_Stopped = true;
+            Sleep(1000);
 
-        cout << "***********************" << endl;
-        cout << "* 1 - Add One Hour    *" << endl;
-        cout << "* 2 - Add One Minute  *" << endl;
-        cout << "* 3 - Add One Second  *" << endl;
-        cout << "* 4 - Exit Program    *" << endl;
-        cout << "***********************" << endl;
 
-        cin >> userSelection;
+            cout << "***********************" << endl;
+            cout << "* 1 - Add One Hour    *" << endl;
+            cout << "* 2 - Add One Minute  *" << endl;
+            cout << "* 3 - Add One Second  *" << endl;
+            cout << "* 4 - Exit Program    *" << endl;
+            cout << "***********************" << endl;
 
-        if (userSelection < 1 || userSelection > 4)
-        {
-            cout << "Not a valid entry. Select 1 - 4" << endl;
+            cin >> userSelection;
+
+            if (userSelection < 1 || userSelection > 4)
+            {
+                cout << "Not a valid entry. Select 1 - 4" << endl;
+            }
+            else if (userSelection == 1)
+            {
+                // Used ternary operator due to the simplicity of the condition
+                _12hrs = (_12hrs == 12) ? 1 : ++_12hrs;
+                _24hrs++;
+                is_Stopped = false;
+                menuStopped = true;
+            }
+            else if (userSelection == 2)
+            {
+                minutes++;
+                is_Stopped = false;
+                menuStopped = true;
+            }
+            else if (userSelection == 3)
+            {
+                seconds++;
+                is_Stopped = false;
+                menuStopped = true;
+            }
+            else if (userSelection == 4)
+            {
+                cout << "Exiting..." << endl;
+                is_Stopped = true;
+                running = true;
+                onTime = true;
+                break;
+
+            }
         }
-        else if (userSelection == 1)
+        else
         {
-            cout << userSelection << " was selected." << endl;
-            _12hrs++;
-            _24hrs++;
-            break;
-        }
-        else if (userSelection == 2)
-        {
-            cout << userSelection << " was selected." << endl;
-            minutes++;
-            break;
-        }
-        else if (userSelection == 3)
-        {
-            cout << userSelection << " was selected." << endl;
-            seconds++;
-            break;
-        }
-        else if (userSelection == 4)
-        {
-            cout << userSelection << " was selected." << endl;
-            break;
-            is_Finished = true;
+            continue;
         }
 
     }
 }
 
-// if Button Pressed?
+
 int main() {
 
-//    bool running = false;
+    while(!running){
 
-    UpdateTime();
-    thread checker(DisplayMenu);
+        thread checker(DisplayMenu);
+        thread worker(UpdateTime);
 
-    checker.join();
-
+        worker.join();
+        checker.join();
+    }
 
     return 0;
 }
