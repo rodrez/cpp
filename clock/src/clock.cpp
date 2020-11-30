@@ -1,129 +1,179 @@
+// Author: Fabian Rodriguez 
+// Class: Cs210 Programming Languages
+// Project: Clock.cpp
+
 #include <iostream>
 #include <iomanip>
 #include <thread>
-#ifdef _WIN32
 #include <Windows.h>
-#else
-#include <unistd.h>
-#endif
-#include <cstdlib>
+#include <conio.h>
+
+
 using namespace std;
 
-
+// Global Variable 
+static int _12hrs = 11;
+static int _24hrs = 23;
+static int minutes = 59;
+static int seconds = 55;
+static string period = " A M";
+static bool is_Finished = false;
 
 // Clear Screen 
-void ClearScreen(){
-    for (int i = 0; i < 10; i++){
+void ClearScreen() {
+
+    //Simple for loop that prints new line(functions as the most basic clear screen)
+    for (int i = 0; i < 5; i++) {
         cout << "\n\n\n\n\n\n\n\n";
     }
 }
 
-void TimeFiller(int value){
-    cout << setw(2)  << setfill('0') << value;
+
+// Keeps the hours, minutes and seconds to 2 digits
+void TimeFiller(int value) {
+    cout << setw(2) << setfill('0') << value;
 }
+
 
 // Display time in two formats
-void DisplayTime(int hrs, int min, int secs, string period){
+void DisplayTime() {
 
-    cout << "*****************************" << endl;
-    cout << "*       12-Hour Clock       *" << endl;
-    cout << "*       " ;
-    TimeFiller(hrs);
-    cout << ':';
-    TimeFiller(min);
-    cout << ':' ;
-    TimeFiller(secs);
-    cout <<  period << "        *" << endl;
-    cout << "*****************************" << endl;
+    // Use the previous timefiller in combination with simple printing
+
+    cout << "*********************"; cout << "    " << "*********************" << endl;
+    cout << "*   12-Hour Clock   *"; cout << "    " << "*   24-Hour Clock   *" << endl;
+    cout << "*   "; TimeFiller(_12hrs); cout << ':'; TimeFiller(minutes); cout << ':'; TimeFiller(seconds); cout << period << "    *";
+    cout << "    ";
+    cout << "*     "; TimeFiller(_24hrs); cout << ':'; TimeFiller(minutes); cout << ':'; TimeFiller(seconds); cout <<"      *" << endl;
+    cout << "*********************"; cout << "    " << "*********************" << endl;
 
 }
-void UpdateTime(bool running){
-    int hrs = 11;
-    int min = 59;
-    int secs = 55;
-    string period = " P M";
-    
 
-    running = true;
 
-    while (running){
+// Updates the time in a 1 second interval.
+// Changes the period from AM to PM when the 24 hours clock is past 11
+// (Did not include less that 24 because the 24hrs clock should reset to 0)
 
-        DisplayTime(hrs, min, secs, period);
-        Sleep(1);
-        if (secs == 59){
-            secs = 0;
-            if (min == 59){
-                min = 0;
-                
-                if (hrs == 11){
-                    hrs++;
-                    if (period == " A M"){
-                        period = " P M";
-                    }
-                    else {
-                        period = " A M";
-                    }
+void UpdateTime() {
+
+
+    // The while loop will keep the clock running until is_Finished becomes true
+    while (!is_Finished) {
+
+
+        // Multiple nested if/else statements helps to increment the time in 1 second interval
+        if (seconds == 59)
+        {
+            seconds = 1;
+
+            if (minutes == 59)
+            {
+                minutes = 1;
+
+                if (_12hrs == 12)
+                {
+                    _12hrs = 1;
                 }
-                else if (hrs == 12){
-                    hrs = 1;
+                else
+                {
+                    _12hrs +=1;
                 }
+
+                if (_24hrs == 23)
+                {
+                    _24hrs = 0;
                 }
-            else{
-                min++;
+                else
+                {
+                    _24hrs += 1;
+                }
+            }
+            else
+            {
+                minutes += 1;
             }
         }
-        else{
-            secs++;
+        else
+        {
+            seconds += 1;
         }
-        
-}
+
+        if (_24hrs > 11)
+        {
+            period = " P M";
+        }
+        else
+        {
+            period = " A M";
+        }
+
+        DisplayTime();
+        Sleep(1000);
+        ClearScreen();
+
+    }
 
 }
 
 // Display Menu
-int DisplayMenu(){
-    cout << "***********************" << endl;
-    cout << "* 1 - Add One Hour    *" << endl;
-    cout << "* 2 - Add One Minute  *" << endl;
-    cout << "* 3 - Add One Second  *" << endl;
-    cout << "* 4 - Exit Program    *" << endl;
-    cout << "***********************" << endl;
+void DisplayMenu() {
 
-    int userSelection;
-    cin >> userSelection;
-    while (userSelection < 1 || userSelection > 4){
+    int userSelection = 0;
+
+    while (true) {
+
+        cout << "***********************" << endl;
+        cout << "* 1 - Add One Hour    *" << endl;
+        cout << "* 2 - Add One Minute  *" << endl;
+        cout << "* 3 - Add One Second  *" << endl;
+        cout << "* 4 - Exit Program    *" << endl;
+        cout << "***********************" << endl;
+
         cin >> userSelection;
-        cout << "Not a valid entry. Select 1 - 4" << endl;
-    }
-    return userSelection;
-}
 
+        if (userSelection < 1 || userSelection > 4)
+        {
+            cout << "Not a valid entry. Select 1 - 4" << endl;
+        }
+        else if (userSelection == 1)
+        {
+            cout << userSelection << " was selected." << endl;
+            _12hrs++;
+            _24hrs++;
+            break;
+        }
+        else if (userSelection == 2)
+        {
+            cout << userSelection << " was selected." << endl;
+            minutes++;
+            break;
+        }
+        else if (userSelection == 3)
+        {
+            cout << userSelection << " was selected." << endl;
+            seconds++;
+            break;
+        }
+        else if (userSelection == 4)
+        {
+            cout << userSelection << " was selected." << endl;
+            break;
+            is_Finished = true;
+        }
+
+    }
+}
 
 // if Button Pressed?
-int main (){
-    bool running = true;
-    thread t1 = thread(UpdateTime, running);
-    // thread t1(UpdateTime, );
-    
+int main() {
 
-    ClearScreen();
-    // cin.get();
-    
-    int userInput = DisplayMenu();
-    if (userInput == 4){
-        running = false;
-    }
-    // Display menu
-    // Read user input
-    // If user input == exit
-        // End program
-    // Else
-        // Add Hours || Minute || Seconds
-        
-// else
-    // add second
-    // Wait second 
-    // loop back to  beggining
+//    bool running = false;
+
+    UpdateTime();
+    thread checker(DisplayMenu);
+
+    checker.join();
+
+
     return 0;
 }
-
