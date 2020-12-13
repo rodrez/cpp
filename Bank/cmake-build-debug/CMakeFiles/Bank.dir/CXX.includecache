@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/fjrod/OneDrive/Desktop/Code/CPP/Bank/InvestCalculator.cpp
+InvestCalculator.h
+C:/Users/fjrod/OneDrive/Desktop/Code/CPP/Bank/InvestCalculator.h
+iostream
+-
+iomanip
+-
+
+C:/Users/fjrod/OneDrive/Desktop/Code/CPP/Bank/InvestCalculator.h
+vector
+-
+
+C:/Users/fjrod/OneDrive/Desktop/Code/CPP/Bank/main.cpp
+iostream
+-
+iomanip
+-
+InvestCalculator.h
+C:/Users/fjrod/OneDrive/Desktop/Code/CPP/Bank/InvestCalculator.h
+
